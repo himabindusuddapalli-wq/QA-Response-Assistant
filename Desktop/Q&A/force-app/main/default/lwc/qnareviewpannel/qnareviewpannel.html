@@ -1,0 +1,779 @@
+<template>
+    <div class="workspace">
+
+        <!-- ── Strategy comparison modal ────────────────────────────────── -->
+        <template if:true={showStrategyCompare}>
+            <div class="modal-backdrop">
+                <div class="strategy-modal">
+                    <div class="strategy-modal-header">
+                        <span class="strategy-modal-title">Apply Strategy — Compare Answers</span>
+                        <button class="iconbtn modal-close" onclick={handleDismissStrategyCompare} title="Close">✕</button>
+                    </div>
+                    <div class="strategy-modal-content">
+                        <div class="strategy-modal-body">
+                            <!-- Left: Original (removals struck in red) -->
+                            <div class="diff-panel-qna">
+                                <div class="diff-panel-qna-header">
+                                    <span class="diff-panel-qna-title">Your Current Answer</span>
+                                </div>
+                                <div class="diff-panel-qna-content" lwc:dom="manual" data-side="original"></div>
+                            </div>
+                            <!-- Right: AI Strategy (additions in green) + eye toggle -->
+                            <div class="diff-panel-qna diff-panel-qna--ai">
+                                <div class="diff-panel-qna-header">
+                                    <div class="diff-label-row">
+                                        <span class="diff-panel-qna-title">
+                                            <lightning-icon icon-name="utility:agent_astro" size="xx-small" class="ebtn-icon strategy-label-icon">
+                                            </lightning-icon>
+                                            AI Strategy Answer
+                                        </span>
+                                        <lightning-icon icon-name="utility:preview" size="x-small"
+                                            title="Toggle diff view" class={strategyDiffIconClass}
+                                            onclick={toggleStrategyDiffView}></lightning-icon>
+                                    </div>
+                                </div>
+                                <div class="diff-panel-qna-content" lwc:dom="manual" data-side="strategy"></div>
+                            </div>
+                        </div>
+
+                        <!-- Reasoning panel — shows which strategy points were applied and how -->
+                        <template if:true={hasStrategyReasoning}>
+                            <div class="strategy-reasoning">
+                                <button class="strategy-reasoning-title strategy-reasoning-toggle" onclick={toggleStrategyReasoning}>
+                                    <lightning-icon icon-name="utility:strategy" size="xx-small" class="ebtn-icon">
+                                    </lightning-icon>
+                                    How the strategy was applied
+                                    <lightning-icon icon-name={strategyReasoningChevron} size="xx-small" class="strategy-reasoning-chevron">
+                                    </lightning-icon>
+                                </button>
+                                <template if:true={strategyReasoningOpen}>
+                                    <div class="strategy-reasoning-grid">
+                                        <template for:each={strategyReasoning} for:item="r">
+                                            <div key={r.key} class="strategy-reasoning-row">
+                                                <span class="strategy-point-id">{r.strategy_point_id}</span>
+                                                <div class="strategy-reasoning-detail">
+                                                    <div class="strategy-point-text">{r.strategy_point}</div>
+                                                    <div class="strategy-change-made">
+                                                        <span class="strategy-change-label">Change: </span>{r.change_made}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="diff-modal-footer">
+                        <button class="ebtn ebtn-ghost" onclick={handleDismissStrategyCompare}>Go Back</button>
+                        <button class="ebtn ebtn-primary" onclick={handleUseStrategyAnswer}>Apply Changes</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+      <!-- ── Strategy: not-needed notice (AI-voiced) ─────────────────── -->
+<!-- ── Strategy: not-needed notice ─────────────────────────────── -->
+<template if:true={showStrategySkipConfirm}>
+    <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="strategy-skip-heading"
+        class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning-icon icon-name="utility:agent_astro" size="x-small"
+                    class="slds-m-right_x-small">
+                </lightning-icon>
+                <h2 id="strategy-skip-heading" class="slds-modal__title slds-hyphenate">Strategy Doesn’t Seem Needed Here</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <p class="slds-m-bottom_small">{strategySkipReason}</p>
+                <p class="slds-text-color_weak">You can cancel, or apply strategy anyway if you’d still like to proceed.</p>
+            </div>
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={handleStrategySkip}>Cancel</button>
+                <button class="slds-button slds-button_brand" onclick={handleStrategyOverride}>Apply Strategy Anyway</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+        <!-- ── Style: confirmation modal ────────────────────────────────── -->
+        <template if:true={showStyleConfirm}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="style-confirm-heading"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="style-confirm-heading" class="slds-modal__title slds-hyphenate">Confirmation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium slds-text-align_center">
+                        <p>You are about to Style the answer without modifying its content.</p>
+                        <p class="slds-m-top_x-small">Please confirm that you have reviewed it and would like to proceed.</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={handleStyleGoBack}>Go back</button>
+                        <button class="slds-button slds-button_brand" onclick={handleStyleContinue}>Continue</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ── Style: compare modal (matches the Apply Strategy layout) ──── -->
+        <template if:true={showStyleDiff}>
+            <div class="modal-backdrop">
+                <div class="strategy-modal">
+                    <div class="strategy-modal-header">
+                        <span class="strategy-modal-title">Style — Compare Answers</span>
+                        <button class="iconbtn modal-close" onclick={handleStyleCancel} title="Close">✕</button>
+                    </div>
+                    <div class="strategy-modal-content">
+                        <div class="strategy-modal-body">
+                            <!-- Left: Final Answer (removals struck in red) -->
+                            <div class="diff-panel-qna">
+                                <div class="diff-panel-qna-header">
+                                    <span class="diff-panel-qna-title">Final Answer</span>
+                                </div>
+                                <div class="diff-panel-qna-content" lwc:dom="manual" data-diff="final"></div>
+                            </div>
+                            <!-- Right: Styled Answer (additions in green) + eye toggle -->
+                            <div class="diff-panel-qna diff-panel-qna--ai">
+                                <div class="diff-panel-qna-header">
+                                    <div class="diff-label-row">
+                                        <span class="diff-panel-qna-title">
+                                            <lightning-icon icon-name="utility:palette" size="xx-small" class="ebtn-icon slds-m-right_xx-small">
+                                            </lightning-icon>
+                                            Styled Answer
+                                        </span>
+                                        <lightning-icon icon-name="utility:preview" size="x-small"
+                                            title="View AI changes" class={styleDiffIconClass}
+                                            onclick={toggleStyleDiffView}></lightning-icon>
+                                    </div>
+                                </div>
+                                <div class="diff-panel-qna-content" lwc:dom="manual" data-diff="styled"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="diff-modal-footer">
+                        <button class="ebtn ebtn-ghost" onclick={handleStyleCancel}>Go Back</button>
+                        <button class="ebtn ebtn-primary" onclick={handleApplyStyle}>Apply Changes</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ── Edit-with-AI: instructions modal ─────────────────────────── -->
+        <template if:true={showEditAIInstructions}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="editai-heading"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="editai-heading" class="slds-modal__title slds-hyphenate">
+                            Edit Using AI
+                            <lightning-icon icon-name="utility:agent_astro" size="x-small" class="slds-m-left_xx-small">
+                            </lightning-icon>
+                        </h2>
+                    </header>
+                  <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-textarea
+                            name="editai-instructions"
+                            label="Instructions"
+                            value={editInstructions}
+                            onchange={handleEditInstructionsChange}></lightning-textarea>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={handleCancelEditAI}>Cancel</button>
+                       <button class="slds-button slds-button_brand" onclick={handleReviseEditAI} disabled={isEditAILoading}>
+                            <template if:true={isEditAILoading}>Revising…</template>
+                            <template if:false={isEditAILoading}>Revise</template>
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ── Edit-with-AI: revised answer modal ───────────────────────── -->
+        <template if:true={showEditAIResult}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="airevised-heading"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="airevised-heading" class="slds-modal__title slds-hyphenate">
+                            AI Revised Answer
+                            <lightning-icon icon-name="utility:agent_astro" size="x-small" class="slds-m-left_xx-small">
+                            </lightning-icon>
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-input-rich-text value={aiRevisedAnswer} onchange={handleAiRevisedChange}>
+                        </lightning-input-rich-text>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={handleGoBackEditAI}>Go Back</button>
+                        <button class="slds-button slds-button_brand" onclick={handleApplyAIChanges}>Apply Changes</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ── Mark-as-complete confirmation ─────────────────────────────── -->
+        <template if:true={showCompleteConfirm}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="confirm-heading"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="confirm-heading" class="slds-modal__title slds-hyphenate">Confirmation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Are you sure you want to mark this response as complete?</p>
+                        <p class="slds-m-top_x-small">
+                            <b>Note: Once marked as complete, this response can no longer be edited.</b>
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={cancelMarkComplete}>Cancel</button>
+                        <button class="slds-button slds-button_brand" onclick={confirmMarkComplete}>Confirm</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ── Unsaved-changes confirmation ──────────────────────────────── -->
+        <template if:true={showUnsavedConfirm}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="unsaved-heading"
+                class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="unsaved-heading" class="slds-modal__title slds-hyphenate">Discard changes?</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Your answer has not been saved.</p>
+                        <p class="slds-m-top_x-small">
+                            <b>If you go back now, your changes will be lost.</b>
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={handleKeepEditing}>Keep editing</button>
+                        <button class="slds-button slds-button_brand" onclick={handleConfirmDiscard}>Discard</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- ── Header ──────────────────────────────────────────────────── -->
+     
+        <div class="header">
+            <div class="header-left">
+                <!-- Back to matches — edit mode only -->
+                <template if:true={isEditing}>
+                    <button class="iconbtn back-header" onclick={handleCancelEdit} title="Back to matches" aria-label="Back to matches">
+                        <lightning-icon icon-name="utility:back" size="xx-small" class="iconbtn-icon"></lightning-icon>
+                    </button>
+                </template>
+                <span class="doc-title" title={headerName}>{headerName}</span>
+            </div>
+
+            <div class="filter-bar">
+                <lightning-button-menu label={statusLabel} variant="border-filled" menu-alignment="right"
+                    onselect={handleStatusSelect} class="filter-menu">
+                    <template for:each={statusOptions} for:item="opt">
+                        <lightning-menu-item key={opt.value} label={opt.label} value={opt.value}></lightning-menu-item>
+                    </template>
+                </lightning-button-menu>
+
+                <lightning-button-menu label={sectionLabel} variant="border-filled" menu-alignment="right"
+                    onselect={handleSectionSelect} class="filter-menu">
+                    <template for:each={sectionOptions} for:item="opt">
+                        <lightning-menu-item key={opt.value} label={opt.label} value={opt.value}></lightning-menu-item>
+                    </template>
+                </lightning-button-menu>
+
+                <template if:true={showEditButton}>
+                    <button class="edit-strategy-btn" onclick={handleReopenQuestion}
+                        title="Reopen this answer to apply strategy" aria-label="Edit and apply strategy">
+                        <lightning-icon icon-name="utility:strategy" size="xx-small" class="edit-strategy-icon"></lightning-icon>
+                        <span>Edit and apply strategy</span>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- ── Search / Filter Panel ─────────────────────────────────────  -->
+        <template if:true={showSearchPanel}>
+            <div class="search-panel">
+                <div class="search-panel-head">
+                    <span class="search-panel-title">Filter matches</span>
+                    <button class="btn-clear-filters" onclick={clearFilters}>Clear All Filters</button>
+                </div>
+                <div class="search-panel-inner slds-grid slds-gutters slds-wrap">
+
+                    <!-- Company -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">Company</div>
+                            <div class="lookup-control">
+                                <template if:true={filterCompany}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterCompany}</span><button class="lookup-chip-clear" data-field="company" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterCompany}>
+                                    <input type="text" class="lookup-input" data-field="company" placeholder="Search companies…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isCompanyOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredCompanyOpts}><template
+                                                    for:each={filteredCompanyOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="company"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredCompanyOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consulting Firm -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">Consulting Firm</div>
+                            <div class="lookup-control">
+                                <template if:true={filterConsultingFirm}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterConsultingFirm}</span><button class="lookup-chip-clear" data-field="consultingFirm" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterConsultingFirm}>
+                                    <input type="text" class="lookup-input" data-field="consultingFirm" placeholder="Search firms…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isConsultingFirmOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredConsultingFirmOpts}><template
+                                                    for:each={filteredConsultingFirmOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="consultingFirm"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredConsultingFirmOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Industry -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">Industry</div>
+                            <div class="lookup-control">
+                                <template if:true={filterIndustry}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterIndustry}</span><button class="lookup-chip-clear" data-field="industry" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterIndustry}>
+                                    <input type="text" class="lookup-input" data-field="industry" placeholder="Search industries…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isIndustryOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredIndustryOpts}><template
+                                                    for:each={filteredIndustryOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="industry"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredIndustryOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Name -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">File Name</div>
+                            <div class="lookup-control">
+                                <template if:true={filterFileName}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterFileName}</span><button class="lookup-chip-clear" data-field="fileName" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterFileName}>
+                                    <input type="text" class="lookup-input" data-field="fileName" placeholder="Search files…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isFileNameOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredFileNameOpts}><template
+                                                    for:each={filteredFileNameOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="fileName"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredFileNameOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RFP Name -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">RFP Name</div>
+                            <div class="lookup-control">
+                                <template if:true={filterRfpName}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterRfpName}</span><button class="lookup-chip-clear" data-field="rfpName" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterRfpName}>
+                                    <input type="text" class="lookup-input" data-field="rfpName" placeholder="Search RFPs…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isRfpNameOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredRfpNameOpts}><template
+                                                    for:each={filteredRfpNameOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="rfpName"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredRfpNameOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SVP Name -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">SVP Name</div>
+                            <div class="lookup-control">
+                                <template if:true={filterSvpName}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterSvpName}</span><button class="lookup-chip-clear" data-field="svpName" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterSvpName}>
+                                    <input type="text" class="lookup-input" data-field="svpName" placeholder="Search SVPs…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isSvpNameOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredSvpNameOpts}><template
+                                                    for:each={filteredSvpNameOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="svpName"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredSvpNameOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topic Area -->
+                    <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                        <div class="lookup-wrap">
+                            <div class="lookup-label">Topic Area</div>
+                            <div class="lookup-control">
+                                <template if:true={filterTopicArea}>
+                                    <div class="lookup-chip">
+                                        <span class="lookup-chip-text">{filterTopicArea}</span><button class="lookup-chip-clear" data-field="topicArea" onclick={handleLookupClear}>&#x2715;</button>
+                                    </div>
+                                </template>
+                                <template if:false={filterTopicArea}>
+                                    <input type="text" class="lookup-input" data-field="topicArea" placeholder="Search topics…" onfocus={handleLookupFocus} oninput={handleLookupInput} onblur={handleLookupBlur} />
+                                    <template if:true={isTopicAreaOpen}>
+                                        <div class="lookup-dropdown">
+                                            <template if:true={hasFilteredTopicAreaOpts}><template
+                                                    for:each={filteredTopicAreaOpts} for:item="v">
+                                                    <div key={v} class="lookup-option" data-field="topicArea"
+                                                        data-value={v} onmousedown={handleLookupSelect}>{v}</div>
+                                                </template></template>
+                                            <template if:false={hasFilteredTopicAreaOpts}>
+                                                <div class="lookup-empty">No matches</div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </template>
+
+        <!-- ── Active Filter Chips ───────────────────────────────────────── -->
+        <template if:true={hasActiveFilters}>
+            <div class="active-filters">
+                <span class="active-filters-label">Active filters:</span>
+                <template for:each={activeFilterTags} for:item="tag">
+                    <span key={tag.key} class="filter-tag">
+                        {tag.label}
+                        <span class="filter-tag-remove" data-key={tag.key} onclick={removeFilter} title="Remove filter">&#x2715;</span>
+                    </span>
+                </template>
+            </div>
+        </template>
+
+        <!-- ── Loading / Error ──────────────────────────────────────────── -->
+        <template if:true={isLoading}>
+            <div class="loading-state">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                <p class="loading-message">Loading questions...</p>
+            </div>
+        </template>
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-p-around_medium">{error}</div>
+        </template>
+
+        <!-- ── Main Content ─────────────────────────────────────────────── -->
+        <template if:false={isLoading}>
+            <template if:true={hasQuestions}>
+
+                <div class="body">
+
+                    <p class="position-label">{positionLabel}</p>
+
+                    <!-- Completed badge — above the question (review mode) -->
+                    <template if:false={isEditing}>
+                        <template if:true={isCurrentQuestionComplete}>
+                            <div class="complete-badge complete-badge--full">This answer is marked as complete.</div>
+                        </template>
+                    </template>
+
+                    <!-- Question Banner -->
+                    <div class="question-banner">
+                        <span class="question-text"><span class="q-num">{displayNumber}.</span>
+                        {currentQuestion.questionText}</span>
+                    </div>
+
+                    <!-- ══════════════ REVIEW MODE ══════════════ -->
+                    <template if:false={isEditing}>
+
+                        <!-- Matches loading -->
+                        <template if:true={isLoadingMatches}>
+                            <div class="matches-loading">
+                                <lightning-spinner alternative-text="Loading answers" size="small"></lightning-spinner>
+                                <span class="matches-loading-text">Searching repository...</span>
+                            </div>
+                        </template>
+
+                        <!-- Matches ready and found -->
+                        <template if:true={showMatches}>
+                            <!-- Matches strip -->
+                            <div class="matches-strip slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                <span class="matches-found">{matchesFoundLabel}</span>
+                                <div class="match-pager">
+                                    <lightning-button-icon icon-name="utility:chevronleft" variant="bare"
+                                        alternative-text="Previous match" onclick={handlePrevMatch}
+                                        disabled={isFirstMatch} class="pager-btn"></lightning-button-icon>
+                                    <span class="match-pos">{matchPositionLabel}</span>
+                                    <lightning-button-icon icon-name="utility:chevronright" variant="bare"
+                                        alternative-text="Next match" onclick={handleNextMatch} disabled={isLastMatch}
+                                        class="pager-btn"></lightning-button-icon>
+                                </div>
+                            </div>
+
+                            <!-- Match Card -->
+                            <div class="match-card">
+
+                                <!-- Meta row: Source details toggle (left) + Match Score pill (right) -->
+                                <div class="match-meta-row slds-grid slds-grid_align-spread slds-grid_vertical-align-center"
+                                    onclick={toggleMatchDetails}>
+                                    <button class="match-details-toggle">
+                                        <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                            class={matchDetailsChevronClass}></lightning-icon>
+                                        <span>Match details</span>
+                                    </button>
+                                    <span class="score">
+                                        <span class="score-cap">Match Score</span>
+                                    <span class="score-num">{scoreDisplay}</span>
+                                    </span>
+                                </div>
+
+                                <!-- Collapsible pills — values only, like the prototype -->
+                                <template if:true={matchDetailsOpen}>
+                                    <div class="pills">
+                                        <span class="pill">{currentMatch.company}</span>
+                                        <span class="pill">{currentMatch.consultingFirm}</span>
+                                        <span class="pill">{currentMatch.rfp}</span>
+                                        <span class="pill">{currentMatch.effectivePeriod}</span>
+                                        <span class="pill">{currentMatch.industry}</span>
+                                        <span class="pill">{currentMatch.svpName}</span>
+                                    </div>
+                                </template>
+
+                                <!-- Matched question heading + underline accent -->
+                                <template if:true={currentMatch.question}>
+                                    <h2 class="match-q-heading">Q. {currentMatch.question}</h2>
+                                    <div class="match-q-underline"></div>
+                                </template>
+
+                                <!-- Answer — finalised answer if saved, else the repository match -->
+                                <template if:true={hasFinalAnswer}>
+                                    <div class="answer-box">
+                                        <div class="match-a answer-final" lwc:dom="manual"></div>
+                                    </div>
+                                </template>
+                                <template if:false={hasFinalAnswer}>
+                                    <div class="answer-box">
+                                        <p class={answerClass}>{currentMatch.answer}</p>
+                                        <template if:true={showAnswerToggle}>
+                                            <button class="more" onclick={toggleAnswer}>{answerToggleLabel}</button>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <!-- Select / Draft — hidden once the question is complete -->
+                                <template if:false={isCurrentQuestionComplete}>
+                                    <div class="action-buttons">
+                                        <button class="btn-select" onclick={handleSelectAnswer}>Select answer</button>
+                                        <button class="btn-draft" onclick={handleDraftNew} title="Use this option when none of the existing answers meet your requirements.">Draft new</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- No matches (loaded, none found) -->
+                        <template if:true={showNoMatches}>
+                            <div class="no-matches-state">
+                                <lightning-icon icon-name="utility:search" size="small" class="no-matches-icon">
+                                </lightning-icon>
+                                <p class="no-matches-text">
+                                    <template if:true={hasActiveFilters}>No matches found for the selected
+                                        filters.</template>
+                                    <template if:false={hasActiveFilters}>No matching answers found in the
+                                        repository.</template>
+                                </p>
+                                <div class="slds-m-top_medium">
+                                    <button class="btn-draft btn--full" onclick={handleDraftNew} title="Use this option when none of the existing answers meet your requirements.">Draft new</button>
+                                </div>
+                            </div>
+                        </template>
+
+                    </template>
+                    <!-- ══════════════ END REVIEW MODE ══════════════ -->
+
+
+                    <!-- ══════════════ EDIT MODE ══════════════ -->
+                    <template if:true={isEditing}>
+                        <div class="editor-card">
+
+                            <!-- Completed badge -->
+                            <template if:true={isCompleted}>
+                                <div class="complete-badge">This answer is marked as complete.</div>
+                            </template>
+
+                            <!-- Top row: edit / close-edit — hidden once completed -->
+                            <template if:false={isCompleted}>
+                                <div class="editor-toprow editor-toprow--right-only">
+                                    <div class="editor-toprow-right">
+                                        <button class="iconbtn" onclick={handleEnableEditing} title="Edit" aria-label="Edit">
+                                            <lightning-icon icon-name="utility:edit" size="xx-small" class="iconbtn-icon"></lightning-icon>
+                                        </button>
+                                        <button class="iconbtn" onclick={handleCloseEditing} title="Close edit" aria-label="Close edit">
+                                            <lightning-icon icon-name="utility:close" size="xx-small" class="iconbtn-icon"></lightning-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Q heading + underline accent (matches review card) -->
+                            <template if:true={selectedMatch}>
+                                <h2 class="match-q-heading">Q. {selectedMatch.question}</h2>
+                            </template>
+                            <template if:false={selectedMatch}>
+                                <h2 class="match-q-heading">Q. {currentQuestion.questionText}</h2>
+                            </template>
+                            <div class="match-q-underline"></div>
+
+                            <!-- Rich Text Editor — hidden once completed -->
+                            <template if:false={isCompleted}>
+                                <lightning-input-rich-text value={editAnswer} onchange={handleAnswerChange}
+                                    disabled={rteReadOnly} class="edit-rte">
+                                </lightning-input-rich-text>
+                                <p class="char-count">{answerCountLabel}</p>
+                            </template>
+
+                            <!-- Completed → read-only answer display -->
+                            <template if:true={isCompleted}>
+                                <div class="answer-readonly" lwc:dom="manual"></div>
+                            </template>
+
+                            <!-- Action Buttons -->
+                            <div class="editor-actions">
+                                <button class="ebtn" onclick={handleMarkComplete} disabled={isCompleted}>Mark as Complete</button>
+                                <button class="ebtn" onclick={handleSaveAsDraft} disabled={isCompleted}>Save as Draft</button>
+                                <button class="ebtn" onclick={handleEditWithAI} disabled={isCompleted}>
+                                    <lightning-icon icon-name="utility:agent_astro" alternative-text="AI"
+                                        title="Smart Assistant" size="xx-small" class="ebtn-icon"></lightning-icon>
+                                    Edit
+                                </button>
+                                <button class="ebtn" onclick={handleStyle} disabled={isStyleDisabled}>
+                                    <template if:true={isStyleLoading}>
+                                        <lightning-spinner alternative-text="Styling…" size="small" class="btn-spinner"></lightning-spinner>
+                                        Styling…
+                                    </template>
+                                    <template if:false={isStyleLoading}>Style</template>
+                                </button>
+                                <button class="ebtn" onclick={handleStrategizeAnswer} disabled={isCompleted}>
+                                    <template if:true={isStrategyLoading}>
+                                        <lightning-spinner alternative-text="Applying strategy…" size="small" class="btn-spinner"></lightning-spinner>
+                                        Applying strategy…
+                                    </template>
+                                    <template if:false={isStrategyLoading}>Apply Strategy</template>
+                                </button>
+                            </div>
+
+                        </div>
+                    </template>
+                    <!-- ══════════════ END EDIT MODE ══════════════ -->
+
+                </div>
+
+            </template>
+
+            <template if:false={hasQuestions}>
+                <div class="slds-p-around_large slds-text-align_center slds-text-color_weak">
+                    No questions match the current search / filters.
+                </div>
+            </template>
+
+            <!-- Footer -->
+            <div class="footer">
+                <!-- Review mode: search + prev/next -->
+                <template if:false={isEditing}>
+                    <div class="q-search">
+                        <lightning-icon icon-name="utility:search" size="x-small" class="q-search-icon">
+                        </lightning-icon>
+                        <input type="text" class="q-search-input" placeholder={searchPlaceholder}
+                value={questionSearchTerm} oninput={handleQuestionSearch} />
+                    </div>
+                    <button class="nav-btn nav-prev" onclick={handlePrevious} disabled={isFirst}>&#8592; Previous question</button>
+                    <button class="nav-btn nav-next" onclick={handleNext} disabled={isLast}>Next question &#8594;</button>
+                </template>
+
+                <!-- Edit mode: back to matches only -->
+                <template if:true={isEditing}>
+                    <button class="nav-btn nav-prev" onclick={handleCancelEdit}>&#8592; Back</button>
+                </template>
+            </div>
+
+        </template>
+
+    </div>
+</template>

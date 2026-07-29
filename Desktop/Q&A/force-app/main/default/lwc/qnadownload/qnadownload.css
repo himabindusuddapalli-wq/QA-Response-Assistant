@@ -1,0 +1,375 @@
+/* wider, roomier panel */
+.qa-panel {
+    padding: 0 0 16px;
+    min-width: 720px;
+}
+
+/* Header band with background */
+.qa-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 20px 12px;
+    background: linear-gradient(135deg, #eaf3fc 0%, #f3f8fd 100%);
+    border-bottom: 1px solid #e2e6ec;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+}
+.qa-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #16324f;
+}
+
+.qa-subtitle {
+    color: #5a5a5a;
+    font-size: 0.92rem;
+    margin: 12px 0 16px;
+    text-align: center;
+}
+
+.qa-spinner {
+    position: relative;
+    min-height: 64px;
+}
+
+/* Stats — parent total + muted secondary metrics */
+.qa-stats {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e2e6ec;
+    border-radius: 9px;
+    padding: 11px 16px;
+    margin: 0 20px 18px;
+    background: #fafbfc;
+    overflow: visible;              /* allow tooltips to escape the card */
+}
+
+/* Parent figure */
+.qa-stat-total {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    padding-right: 4px;
+}
+.qa-total-num {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #0b5cab;
+    line-height: 1;
+}
+.qa-total-lbl {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #16324f;
+    margin-top: 5px;
+}
+
+/* Dividers */
+.qa-vrule {
+    align-self: stretch;
+    width: 1px;
+    background: #d6dbe2;
+    margin: 3px 0;
+}
+.qa-vrule--thin { background: #e2e6ec; }
+
+/* Secondary metrics — lower weight, muted */
+.qa-substat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 60px;
+    padding: 0 4px;
+}
+.qa-substat-num {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #64707d;
+    line-height: 1;
+}
+.qa-substat-lbl {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a94a0;
+    margin-top: 5px;
+}
+
+/* Hover tooltip (Finalized, Draft) */
+.qa-has-tip { position: relative; cursor: help; }
+.qa-tip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 220px;
+    text-align: center;
+    background: #16324f;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-transform: none;
+    letter-spacing: normal;
+    padding: 7px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+    z-index: 20;
+    pointer-events: none;
+}
+.qa-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #16324f;
+}
+.qa-has-tip:hover .qa-tip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===== Radio option cards ===== */
+.qa-radios {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 20px 18px;
+}
+.qa-radio {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 34px 14px 16px;
+    border: 1px solid #d6dbe2;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.qa-radio:hover {
+    background: #f6faff;
+    border-color: #bcdcf7;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+.qa-radio--sel {
+    background: #eaf3fc;
+    border-color: #0b5cab;
+    box-shadow: 0 0 0 1px #0b5cab inset;
+}
+.qa-radio-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.qa-radio-mark {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    border: 2px solid #9aa3ad;
+    border-radius: 50%;
+    position: relative;
+    transition: border-color 0.15s ease;
+}
+.qa-radio--sel .qa-radio-mark { border-color: #0b5cab; }
+.qa-radio--sel .qa-radio-mark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #0b5cab;
+    transform: translate(-50%, -50%);
+}
+.qa-radio-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.qa-radio-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #16324f;
+}
+.qa-radio-desc {
+    font-size: 0.78rem;
+    color: #5a5a5a;
+    line-height: 1.3;
+}
+
+/* Action buttons */
+.qa-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: stretch;
+    justify-content: center;
+    margin: 0 20px;
+}
+/* Cancel + Download aligned to the right corner */
+.qa-actions--right {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 0 20px;
+}
+.qa-actions--right .qa-dl-btn {
+    width: auto;
+    min-width: 130px;
+    min-height: 44px;
+}
+.qa-dl-btn {
+    width: 100%;
+    min-height: 56px;           /* fixed height so 1-line and 2-line labels match */
+    display: flex;              /* center the label in the box */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: #eaf3fc;
+    color: #0b5cab;
+    border: 1px solid #bcdcf7;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.qa-dl-btn:hover {
+    background: #dcebfb;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.qa-dl-btn:active {
+    background: #cfe3f8;
+}
+
+.qa-foot {
+    margin: 18px 0 0;
+    font-size: 0.75rem;
+    color: #8a8a8a;
+    text-align: center;
+}
+
+/* strategic warning panel */
+.qa-warn {
+    text-align: center;
+    padding: 0 0 12px;
+}
+.qa-warn-band {
+    background: linear-gradient(135deg, #fef6e7 0%, #fdf0d5 100%);
+    border-bottom: 1px solid #f4d99a;
+    padding: 18px 20px 16px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 18px;
+}
+.qa-warn-icon { margin-bottom: 8px; }
+.qa-warn-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #8a5a00;
+    margin: 0 0 4px;
+}
+.qa-warn-msg {
+    font-size: 13.5px;
+    color: #5a4a2a;
+    margin: 0;
+}
+.qa-warn-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 20px;
+}
+.qa-warn-stat { display: flex; flex-direction: column; }
+.qa-warn-num { font-size: 22px; font-weight: 700; color: #185FA5; }
+.qa-warn-lbl { font-size: 12px; color: #6b6b6b; }
+.qa-amber { color: #b7791f !important; }
+.qa-warn-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 20px 10px;
+}
+.qa-secondary {
+    background: #ffffff !important;
+    color: #185FA5 !important;
+    border: 1px solid #185FA5 !important;
+}
+.qa-warn-close {
+    background: none;
+    border: none;
+    color: #6b6b6b;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+/* workspace host */
+.qa-ws-bar {
+    display: flex;
+    padding: 12px 20px 0;
+    margin-bottom: 10px;
+}
+.qa-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    color: #0b5cab;
+    border: 1px solid #bcdcf7;
+    border-radius: 20px;          /* pill */
+    padding: 7px 16px 7px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.qa-back-btn:hover {
+    background: #eaf3fc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transform: translateX(-2px);   /* subtle "going back" nudge */
+}
+.qa-back-btn:active {
+    background: #dcebfb;
+    transform: translateX(0);
+}
+.qa-back-icon {
+    --sds-c-icon-color-foreground-default: #0b5cab;
+}
+.qa-ws-host {
+    max-height: 70vh;
+    overflow: auto;
+}
+.qa-plus {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #0b5cab;
+    margin-left: 1px;
+}
+/* extra breathing room between total and the first metric */
+.qa-stat-total {
+    padding-right: 18px;
+}
+.qa-vrule {
+    margin-right: 14px;
+}

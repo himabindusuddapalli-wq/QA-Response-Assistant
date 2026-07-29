@@ -1,0 +1,180 @@
+<template>
+
+  <!-- Header (blue background, title + X) -->
+  <div class="modal-head">
+    <h1>Q&amp;A Document Upload</h1>
+    <button class="close-btn" onclick={handleClose} title="Close">&#x2715;</button>
+  </div>
+
+  <!-- Body -->
+  <div class="modal-body">
+
+    <!-- Company + Membership Activity (two columns), RFP in second row left -->
+    <div class="three-field-grid">
+
+      <div class="field-group">
+        <label>Company</label>
+        <lightning-input type="search" placeholder="Type to search..."
+          value={companyName} onchange={handleCompanySearch} variant="label-hidden"></lightning-input>
+        <template if:true={companyOptions.length}>
+          <ul class="dropdown">
+            <template for:each={companyOptions} for:item="opt">
+              <li key={opt.Id} data-id={opt.Id} data-name={opt.Name} onclick={handleCompanyPick}>{opt.Name}</li>
+            </template>
+          </ul>
+        </template>
+      </div>
+
+      <div class="field-group">
+        <label>Membership Activity</label>
+        <lightning-input type="search" placeholder="Type to search..."
+          value={maName} onchange={handleMaSearch} variant="label-hidden"></lightning-input>
+        <template if:true={maOptions.length}>
+          <ul class="dropdown">
+            <template for:each={maOptions} for:item="opt">
+              <li key={opt.Id} data-id={opt.Id} data-name={opt.Name} onclick={handleMaPick}>{opt.Name}</li>
+            </template>
+          </ul>
+        </template>
+      </div>
+
+      <div class="field-group">
+        <label>RFP</label>
+        <lightning-input type="search" placeholder="Type to search..."
+          value={rfpName} onchange={handleRfpSearch} variant="label-hidden"></lightning-input>
+        <template if:true={rfpOptions.length}>
+          <ul class="dropdown">
+            <template for:each={rfpOptions} for:item="opt">
+              <li key={opt.Id} data-id={opt.Id} data-name={opt.Name} onclick={handleRfpPick}>{opt.Name}</li>
+            </template>
+          </ul>
+        </template>
+      </div>
+
+    </div>
+
+    <!-- Info banner -->
+    <div class="info-banner">
+      <span class="info-icon">&#9432;</span>
+      <span>At least one of the above fields is required &mdash; Company, Membership Activity, or RFP.</span>
+    </div>
+
+    <!-- File Upload -->
+    <div class="field-group">
+      <label>Upload Q&amp;A Document <span class="label-sub">&mdash; Word, Excel, or PDF</span></label>
+
+      <template if:true={noFile}>
+        <div class={uploadZoneClass}>
+          <label class="upload-zone-btn">
+            <span class="upload-arrow">&#x2B06;</span> Select Q&amp;A Document File
+            <input type="file" accept=".doc,.docx,.xls,.xlsx,.pdf" onchange={handleFile} class="hidden-input" disabled={noRecordSelected} />
+          </label>
+        </div>
+      </template>
+
+      <template if:true={fileName}>
+        <div class="file-preview">
+          <div class="file-icon">{fileIconLabel}</div>
+          <div class="file-info">
+            <span class="file-name">{fileName}</span>
+            <span class="file-meta">{fileSize} &middot; {fileTypeLabel}</span>
+          </div>
+          <button class="remove-btn" onclick={handleRemoveFile} title="Remove">&#x2715;</button>
+        </div>
+      </template>
+
+      <!-- Excel sheet + column mapping (shown after an Excel file is selected) -->
+      <template if:true={showExcelMapping}>
+        <div class="excel-map-wrap">
+          <p class="excel-map-title">
+            <span class="info-icon">&#9432;</span>
+            Select sheets and map columns — auto-detected, adjust if needed.
+          </p>
+          <template for:each={sheetRenderData} for:item="sheet">
+            <div key={sheet.name} class="sheet-block">
+              <label class="sheet-check-label">
+                <input type="checkbox" data-sheet={sheet.name} checked={sheet.isSelected}
+                  onchange={handleSheetToggle} />
+                <span class="sheet-name">{sheet.name}</span>
+              </label>
+              <template if:true={sheet.isSelected}>
+                <div class="sheet-map-body">
+                  <div class="map-row">
+                    <span class="map-label">Header Row</span>
+                    <lightning-combobox value={sheet.headerRow} options={headerRowOptions}
+                      data-sheet={sheet.name} onchange={handleHeaderRowChange}
+                      variant="label-hidden" placeholder="Pick header row"
+                      dropdown-alignment="auto">
+                    </lightning-combobox>
+                  </div>
+                  <template if:true={sheet.headerRow}>
+                    <div class="map-row">
+                      <span class="map-label">Question #</span>
+                      <lightning-combobox value={sheet.mapping.questionNo} options={sheet.headers}
+                        data-sheet={sheet.name} data-field="questionNo" onchange={handleColMappingChange}
+                        variant="label-hidden" placeholder="(none)"
+                        dropdown-alignment="auto">
+                      </lightning-combobox>
+                    </div>
+                    <div class="map-row">
+                      <span class="map-label">Question Text <abbr title="required">*</abbr></span>
+                      <lightning-combobox value={sheet.mapping.questionText} options={sheet.headers}
+                        data-sheet={sheet.name} data-field="questionText" onchange={handleColMappingChange}
+                        variant="label-hidden" placeholder="Select column"
+                        dropdown-alignment="auto">
+                      </lightning-combobox>
+                    </div>
+                    <div class="map-row">
+                      <span class="map-label">Section <abbr title="required">*</abbr></span>
+                      <lightning-combobox value={sheet.mapping.section} options={sheet.headers}
+                        data-sheet={sheet.name} data-field="section" onchange={handleColMappingChange}
+                        variant="label-hidden" placeholder="Select column"
+                        dropdown-alignment="auto">
+                      </lightning-combobox>
+                    </div>
+                    <div class="map-row">
+                      <span class="map-label">Answer Size Limit</span>
+                      <lightning-combobox value={sheet.mapping.answerLimit} options={sheet.headers}
+                        data-sheet={sheet.name} data-field="answerLimit" onchange={handleColMappingChange}
+                        variant="label-hidden" placeholder="(none)"
+                        dropdown-alignment="auto">
+                      </lightning-combobox>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <template if:true={errorMessage}>
+        <p class="error">{errorMessage}</p>
+      </template>
+
+      <p class="file-note"><span class="info-icon">&#9432;</span> Note: Please ensure the uploaded file size does not exceed 2.5 MB.</p>
+
+      <template if:true={isProcessingPdf}>
+        <p class="file-note processing-note"><span class="info-icon">&#9432;</span> {processingPdfMessage}</p>
+      </template>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="modal-foot">
+    <button class={uploadBtnClass} disabled={uploadDisabled} onclick={handleUpload}>{uploadLabel}</button>
+  </div>
+
+  <template if:true={isUploading}>
+    <div class="upload-overlay">
+      <lightning-spinner alternative-text="Uploading" size="medium"></lightning-spinner>
+      <p class="upload-overlay-msg">{uploadLabel}</p>
+    </div>
+  </template>
+
+  <template if:true={showToast}>
+    <div class="toast">&#10003; {toastMessage}</div>
+  </template>
+
+</template>

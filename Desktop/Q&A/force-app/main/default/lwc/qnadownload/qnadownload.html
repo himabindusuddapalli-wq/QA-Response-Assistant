@@ -1,0 +1,142 @@
+<template>
+    <div class="qa-panel">
+        <template if:true={showDownloadView}>
+            <div class="qa-head qa-head--center">
+                <span class="qa-title">Download Q&amp;A Response</span>
+            </div>
+            <template if:true={isLoading}>
+                <div class="qa-spinner">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={stats}>
+                <p class="qa-subtitle qa-subtitle--center">
+                    {docName}<template if:true={hasRfp}> &mdash; {rfpName}</template>
+                </p>
+
+                <div class="qa-stats">
+                    <!-- Parent total -->
+                    <div class="qa-stat-total">
+                        <span class="qa-total-num">{total}</span>
+                        <span class="qa-total-lbl">Total Questions</span>
+                    </div>
+
+                    <div class="qa-vrule"></div>
+
+                    <!-- Secondary metrics -->
+                   <!-- Secondary metrics -->
+                    <div class="qa-substat qa-has-tip">
+                        <span class="qa-substat-num">
+                            {finalized}<template if:true={hasStrategic}><span class="qa-plus">+{strategicCount}</span></template>
+                        </span>
+                        <span class="qa-substat-lbl">Finalized</span>
+                        <span class="qa-tip">{finalizedTip}</span>
+                    </div>
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <div class="qa-substat">
+                        <span class="qa-substat-num">{pending}</span>
+                        <span class="qa-substat-lbl">Pending</span>
+                    </div>
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <!-- <div class="qa-substat">
+                        <span class="qa-substat-num">{strategicCount}</span>
+                        <span class="qa-substat-lbl">Strategic</span>
+                    </div> -->
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <div class="qa-substat qa-has-tip">
+                        <span class="qa-substat-num">{draftCount}</span>
+                        <span class="qa-substat-lbl">Draft</span>
+                        <span class="qa-tip">Work in progress</span>
+                    </div>
+                </div>
+
+                <div class="qa-radios" role="radiogroup">
+                    <label class={classAll}>
+                        <input type="radio" name="dlcat" value="all"
+                               checked={isAll} onchange={handleRadioChange} class="qa-radio-input" />
+                        <span class="qa-radio-mark"></span>
+                        <span class="qa-radio-body">
+                            <span class="qa-radio-title">Finalized</span>
+                            <span class="qa-radio-desc">All finalized questions and answers.</span>
+                        </span>
+                    </label>
+
+                    <label class={classStrategic}>
+                        <input type="radio" name="dlcat" value="strategic"
+                               checked={isStrategic} onchange={handleRadioChange} class="qa-radio-input" />
+                        <span class="qa-radio-mark"></span>
+                        <span class="qa-radio-body">
+                            <span class="qa-radio-title">Strategic</span>
+                            <span class="qa-radio-desc">Finalized questions with a strategy applied.</span>
+                        </span>
+                    </label>
+
+                    <label class={classDraft}>
+                        <input type="radio" name="dlcat" value="draft"
+                               checked={isDraft} onchange={handleRadioChange} class="qa-radio-input" />
+                        <span class="qa-radio-mark"></span>
+                        <span class="qa-radio-body">
+                            <span class="qa-radio-title">Draft</span>
+                            <span class="qa-radio-desc">Drafted questions and answers.</span>
+                        </span>
+                    </label>
+                </div>
+
+               <div class="qa-actions qa-actions--right">
+                    <button class="qa-dl-btn qa-secondary" onclick={handleCancel}>Cancel</button>
+                    <button class="qa-dl-btn" onclick={handleDownload}>{downloadLabel}</button>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={showStrategicWarning}>
+            <div class="qa-warn">
+                <div class="qa-warn-band">
+                    <p class="qa-warn-title">Not many questions have strategy applied</p>
+                    <p class="qa-warn-msg">{strategicMessage}</p>
+                </div>
+
+                <div class="qa-warn-stats">
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num">{strategicInfo.total}</span>
+                        <span class="qa-warn-lbl">Total</span>
+                    </div>
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num">{strategicInfo.completed}</span>
+                        <span class="qa-warn-lbl">Completed</span>
+                    </div>
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num qa-amber">{strategicInfo.strategic}</span>
+                        <span class="qa-warn-lbl">Strategy Applied</span>
+                    </div>
+                </div>
+
+                <div class="qa-warn-actions">
+                    <button class="qa-dl-btn" onclick={handleGoApplyStrategy}>Go back &amp; apply strategy</button>
+                    <button class="qa-dl-btn qa-secondary" onclick={handleDownloadAnyway}>Download anyway</button>
+                    <button class="qa-dl-btn qa-secondary" onclick={handleCloseWarning}>Cancel</button>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={showWorkspace}>
+            <div class="qa-ws-bar">
+                <button class="qa-back-btn" onclick={handleBackToDownload}>
+                    <lightning-icon icon-name="utility:back" size="xx-small" class="qa-back-icon"></lightning-icon>
+                    <span>Back to download</span>
+                </button>
+            </div>
+            <div class="qa-ws-host">
+                <c-qnareviewpannel record-id={_recordId} strategy-mode="true"></c-qnareviewpannel>
+            </div>
+        </template>
+
+    </div>
+</template>
