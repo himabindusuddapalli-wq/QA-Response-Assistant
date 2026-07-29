@@ -34,50 +34,71 @@
     min-height: 64px;
 }
 
-/* Metrics grid — 5 equal-width cards */
-.qa-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+/* Stats — parent total + muted secondary metrics */
+.qa-stats {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e2e6ec;
+    border-radius: 9px;
+    padding: 11px 16px;
     margin: 0 20px 18px;
+    background: #fafbfc;
+    overflow: visible;              /* allow tooltips to escape the card */
 }
-.qa-metric {
+
+/* Parent figure */
+.qa-stat-total {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 16px 10px 14px;
-    border-radius: 10px;
-    background: #ffffff;
-    border: 1px solid #e2e6ec;
-    border-top: 3px solid #e2e6ec;
-    position: relative;
-    overflow: visible;
+    flex: 0 0 auto;
+    padding-right: 4px;
 }
-.qa-metric--total     { border-top-color: #0b5cab; background: #f0f6ff; }
-.qa-metric--finalized { border-top-color: #1a7f42; }
-.qa-metric--strategic { border-top-color: #6b3fa0; }
-.qa-metric--pending   { border-top-color: #b7791f; }
-.qa-metric--draft     { border-top-color: #5a6473; }
-
-.qa-metric-num {
-    font-size: 1.75rem;
+.qa-total-num {
+    font-size: 1.85rem;
     font-weight: 800;
+    color: #0b5cab;
     line-height: 1;
-    margin-bottom: 7px;
 }
-.qa-metric--total     .qa-metric-num { color: #0b5cab; }
-.qa-metric--finalized .qa-metric-num { color: #1a7f42; }
-.qa-metric--strategic .qa-metric-num { color: #6b3fa0; }
-.qa-metric--pending   .qa-metric-num { color: #b7791f; }
-.qa-metric--draft     .qa-metric-num { color: #5a6473; }
-
-.qa-metric-lbl {
-    font-size: 0.65rem;
+.qa-total-lbl {
+    font-size: 0.66rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #16324f;
+    margin-top: 5px;
+}
+
+/* Dividers */
+.qa-vrule {
+    align-self: stretch;
+    width: 1px;
+    background: #d6dbe2;
+    margin: 3px 0;
+}
+.qa-vrule--thin { background: #e2e6ec; }
+
+/* Secondary metrics — lower weight, muted */
+.qa-substat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 60px;
+    padding: 0 4px;
+}
+.qa-substat-num {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #64707d;
+    line-height: 1;
+}
+.qa-substat-lbl {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #8a94a0;
+    margin-top: 5px;
 }
 
 /* Hover tooltip (Finalized, Draft) */
@@ -338,4 +359,17 @@
 .qa-ws-host {
     max-height: 70vh;
     overflow: auto;
+}
+.qa-plus {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #0b5cab;
+    margin-left: 1px;
+}
+/* extra breathing room between total and the first metric */
+.qa-stat-total {
+    padding-right: 18px;
+}
+.qa-vrule {
+    margin-right: 14px;
 }

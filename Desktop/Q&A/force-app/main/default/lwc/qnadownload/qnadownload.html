@@ -15,27 +15,44 @@
                     {docName}<template if:true={hasRfp}> &mdash; {rfpName}</template>
                 </p>
 
-                <div class="qa-metrics-grid">
-                    <div class="qa-metric qa-metric--total">
-                        <span class="qa-metric-num">{total}</span>
-                        <span class="qa-metric-lbl">Total</span>
+                <div class="qa-stats">
+                    <!-- Parent total -->
+                    <div class="qa-stat-total">
+                        <span class="qa-total-num">{total}</span>
+                        <span class="qa-total-lbl">Total Questions</span>
                     </div>
-                    <div class="qa-metric qa-metric--finalized qa-has-tip">
-                        <span class="qa-metric-num">{finalized}</span>
-                        <span class="qa-metric-lbl">Finalized</span>
+
+                    <div class="qa-vrule"></div>
+
+                    <!-- Secondary metrics -->
+                   <!-- Secondary metrics -->
+                    <div class="qa-substat qa-has-tip">
+                        <span class="qa-substat-num">
+                            {finalized}<template if:true={hasStrategic}><span class="qa-plus">+{strategicCount}</span></template>
+                        </span>
+                        <span class="qa-substat-lbl">Finalized</span>
                         <span class="qa-tip">{finalizedTip}</span>
                     </div>
-                    <div class="qa-metric qa-metric--strategic">
-                        <span class="qa-metric-num">{strategicCount}</span>
-                        <span class="qa-metric-lbl">Strategic</span>
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <div class="qa-substat">
+                        <span class="qa-substat-num">{pending}</span>
+                        <span class="qa-substat-lbl">Pending</span>
                     </div>
-                    <div class="qa-metric qa-metric--pending">
-                        <span class="qa-metric-num">{pending}</span>
-                        <span class="qa-metric-lbl">Pending</span>
-                    </div>
-                    <div class="qa-metric qa-metric--draft qa-has-tip">
-                        <span class="qa-metric-num">{draftCount}</span>
-                        <span class="qa-metric-lbl">Draft</span>
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <!-- <div class="qa-substat">
+                        <span class="qa-substat-num">{strategicCount}</span>
+                        <span class="qa-substat-lbl">Strategic</span>
+                    </div> -->
+
+                    <div class="qa-vrule qa-vrule--thin"></div>
+
+                    <div class="qa-substat qa-has-tip">
+                        <span class="qa-substat-num">{draftCount}</span>
+                        <span class="qa-substat-lbl">Draft</span>
                         <span class="qa-tip">Work in progress</span>
                     </div>
                 </div>
