@@ -1,0 +1,4 @@
+<design:component>
+    <design:attribute name="autoOpen" label="Auto-open upload modal"
+        description="Leave checked for the Quick Action (default). Uncheck when placing this component directly on a Lightning Record Page — e.g. the Q&amp;A Document page — otherwise every page visit re-opens the modal. When unchecked, a plain Upload Document button is shown instead."/>
+</design:component>

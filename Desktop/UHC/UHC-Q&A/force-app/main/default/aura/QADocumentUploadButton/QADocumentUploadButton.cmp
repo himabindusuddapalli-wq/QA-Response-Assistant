@@ -1,0 +1,19 @@
+<aura:component implements="force:lightningQuickAction,force:appHostable,flexipage:availableForAllPageTypes" access="global">
+    <aura:attribute name="overlayRef" type="Object"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="autoOpen" type="Boolean" default="true"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:40px 0;">
+            <lightning:spinner alternativeText="Loading upload form..." size="medium"/>
+            <p style="color:#706e6b;font-size:13px;margin:0;">Loading upload form...</p>
+        </div>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!!v.autoOpen}">
+                <lightning:button variant="brand" label="Upload Document" onclick="{!c.handleUploadClick}"/>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+</aura:component>
