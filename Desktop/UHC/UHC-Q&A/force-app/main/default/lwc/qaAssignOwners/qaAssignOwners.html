@@ -1,0 +1,116 @@
+<template>
+    <div class="ao-wrap">
+
+        <!-- Header -->
+        <div class="ao-header">
+            <span class="ao-avatar">
+                <lightning-icon icon-name="utility:user" size="small"></lightning-icon>
+            </span>
+            <div>
+                <h2 class="ao-title">Assign owners</h2>
+                <p class="ao-subtitle">{documentName}</p>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="slds-align_absolute-center slds-p-around_large">
+                <lightning-spinner size="medium" alternative-text="Loading"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={doneLoading}>
+
+            <!-- Progress banner -->
+            <div class="ao-banner">
+                <lightning-icon icon-name="utility:info" size="xx-small"></lightning-icon>
+                <span class="ao-banner-text">{statsText}</span>
+            </div>
+
+            <!-- Bulk assign bar -->
+            <div class="ao-bulkbar">
+                <label class="ao-selectall">
+                    <input type="checkbox" checked={allSelected} onchange={handleSelectAll} />
+                    <span>Select all</span>
+                </label>
+                <div class="ao-bulk-combo">
+                    <lightning-combobox
+                        label="Bulk assign"
+                        variant="label-hidden"
+                        options={teamUserOptions}
+                        value={bulkUserId}
+                        placeholder="Assign selected to…"
+                        onchange={handleBulkUserChange}>
+                    </lightning-combobox>
+                </div>
+                <lightning-button variant="neutral" label="Apply" onclick={handleBulkApply} disabled={noBulkUser}></lightning-button>
+            </div>
+
+            <!-- Scrollable table -->
+            <div class="ao-table-wrap">
+                <table class="ao-table">
+                    <thead>
+                        <tr>
+                            <th class="ao-col-check" scope="col"></th>
+                            <th class="ao-col-num" scope="col">No.</th>
+                            <th scope="col">Question</th>
+                            <th class="ao-col-status" scope="col">Status</th>
+                            <th class="ao-col-assign" scope="col">Assigned to</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={questions} for:item="q">
+                            <tr key={q.id} class={q.rowClass}>
+                                <td class="ao-col-check">
+                                    <input type="checkbox" checked={q.selected} data-id={q.id} onchange={handleRowSelect} />
+                                </td>
+                                <td class="ao-col-num">
+                                    <span class="ao-num">{q.questionNumber}</span>
+                                </td>
+                                <td>
+                                    <p class="ao-qtext" title={q.questionText}>{q.questionText}</p>
+                                </td>
+                                <td class="ao-col-status">
+                                    <template if:true={q.isAssigned}>
+                                        <span class="ao-badge ao-badge--assigned">Assigned</span>
+                                    </template>
+                                    <template if:true={q.isNotAssigned}>
+                                        <span class="ao-badge ao-badge--pending">Pending</span>
+                                    </template>
+                                </td>
+                                <td class="ao-col-assign">
+                                    <lightning-combobox
+                                        label="Assignee"
+                                        variant="label-hidden"
+                                        options={teamUserOptions}
+                                        value={q.assignedToId}
+                                        placeholder="Select a user"
+                                        data-id={q.id}
+                                        onchange={handleRowAssign}>
+                                    </lightning-combobox>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="ao-footer">
+                <p class="ao-footer-note">{pendingCount} questions need an owner</p>
+                <div class="ao-footer-actions">
+                    <lightning-button variant="neutral" label="Reset" onclick={handleCancel}></lightning-button>
+                    <lightning-button variant="brand" label={saveBtnLabel} onclick={handleSave} disabled={isSaving}></lightning-button>
+                </div>
+            </div>
+
+            <template if:true={errorMsg}>
+                <p class="ao-msg-error">{errorMsg}</p>
+            </template>
+            <template if:true={successMsg}>
+                <p class="ao-msg-success">{successMsg}</p>
+            </template>
+
+        </template>
+    </div>
+</template>

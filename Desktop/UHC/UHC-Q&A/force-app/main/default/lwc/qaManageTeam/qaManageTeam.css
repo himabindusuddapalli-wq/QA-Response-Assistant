@@ -1,0 +1,422 @@
+/* ══ Panel shell ═══════════════════════════════════════════════════════════ */
+.panel {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    font-size: 13px;
+    color: #16191c;
+    background: #fff;
+    padding: 0;
+}
+
+/* ══ Header ════════════════════════════════════════════════════════════════ */
+.st-head {
+    padding: 18px 28px 16px;
+    background: #fff;
+    border-bottom: 1px solid #eaeef3;
+}
+.st-eyebrow {
+    font-size: 12px;
+    color: #8a94a0;
+    margin: 0 0 3px;
+}
+.st-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #16191c;
+    margin: 0;
+    line-height: 1.25;
+}
+
+/* ══ Body ══════════════════════════════════════════════════════════════════ */
+.panel-body {
+    padding: 20px 28px 22px;
+    background: #fff;
+}
+.loading-row {
+    display: flex;
+    justify-content: center;
+    padding: 44px 0;
+}
+
+/* ══ Add box — bordered container for the whole add control ════════════════ */
+.addbox {
+    border: 1px solid #e6ebf1;
+    border-radius: 10px;
+    background: #fdfefe;
+    padding: 16px 18px 15px;
+}
+
+.add-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.add-field { display: flex; flex-direction: column; min-width: 0; }
+.add-field--grow { flex: 1; }
+.add-field--role { width: 178px; flex: none; }
+.add-field--btn  { flex: none; }
+
+.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.35;
+    color: #7a8590;
+    margin: 0 0 6px;
+}
+
+/* Role dropdown — matched to the surrounding controls, same text size */
+.add-field--role lightning-combobox {
+    --slds-c-input-sizing-height: 40px;
+    --slds-c-input-radius-border: 8px;
+    --slds-c-input-color-border: #dfe6ee;
+    --slds-c-input-color-border-focus: #7cb6e6;
+    --slds-c-input-text-color: #16191c;
+    --sds-c-input-sizing-height: 40px;
+    --sds-c-input-radius-border: 8px;
+    --sds-c-input-color-border: #dfe6ee;
+    --sds-c-input-text-color: #16191c;
+    /* SLDS sizes its input text from these tokens — pin them so the
+       dropdown text matches the search field and the button */
+    --lwc-fontSize3: 13px;
+    --lwc-lineHeightText: 1.5;
+    --lwc-borderRadiusMedium: 8px;
+    --lwc-colorBorderInput: #dfe6ee;
+    font-size: 13px;
+}
+
+/* Role explainer under the row */
+.role-note {
+    font-size: 12px;
+    color: #98a2ad;
+    line-height: 1.5;
+    margin: 12px 0 0;
+}
+.role-note strong {
+    color: #5b656f;
+    font-weight: 600;
+}
+
+.user-lookup-wrap { position: relative; }
+
+.selected-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef5fc;
+    border: 1px solid #cfe3f7;
+    border-radius: 8px;
+    padding: 0 10px 0 12px;
+    font-size: 13px;
+    color: #0168bd;
+    height: 40px;
+    box-sizing: border-box;
+}
+.pill-icon { color: #0176d3; }
+.pill-name { font-weight: 600; }
+.pill-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7a8590;
+    font-size: 16px;
+    padding: 0 0 0 2px;
+    line-height: 1;
+    transition: color 0.15s;
+}
+.pill-clear:hover { color: #c23934; }
+
+.search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid #dfe6ee;
+    border-radius: 8px;
+    padding: 0 14px;
+    height: 40px;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-wrap:hover { border-color: #c3d2e0; }
+.search-wrap:focus-within {
+    border-color: #7cb6e6;
+    box-shadow: 0 0 0 3px rgba(1,118,211,0.10);
+}
+.search-icon { color: #a3adb8; flex-shrink: 0; }
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    background: transparent;
+    color: #16191c;
+}
+.search-input::placeholder { color: #a3adb8; }
+
+/* Results dropdown */
+.results-dropdown {
+    position: absolute;
+    z-index: 100;
+    left: 0; right: 0;
+    background: #fff;
+    border: 1px solid #e3e8ee;
+    border-radius: 8px;
+    box-shadow: 0 8px 22px rgba(22,25,28,0.10);
+    list-style: none;
+    margin: 5px 0 0;
+    padding: 4px 0;
+    max-height: 172px;
+    overflow-y: auto;
+}
+.result-item {
+    padding: 9px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #16191c;
+    transition: background 0.1s, color 0.1s;
+}
+.result-item:hover { background: #f2f8ff; color: #0168bd; }
+.no-results {
+    font-size: 12px;
+    color: #a3adb8;
+    padding: 9px 4px 0;
+    margin: 0;
+}
+
+/* ══ Buttons ═══════════════════════════════════════════════════════════════ */
+.add-btn,
+.btn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.add-btn {
+    background: #fff;
+    color: #0168bd;
+    border-color: #cfe3f7;
+}
+.add-btn:hover:not(:disabled) { background: #eef5fc; border-color: #9ecbf0; }
+.add-btn:disabled {
+    background: #f7f9fb;
+    border-color: #e9edf2;
+    color: #b3bcc5;
+    cursor: not-allowed;
+}
+
+.btn--brand {
+    background: #0176d3;
+    color: #fff;
+    border-color: #0176d3;
+}
+.btn--brand:hover:not(:disabled) { background: #0168bd; border-color: #0168bd; }
+.btn--brand:disabled {
+    background: #f7f9fb;
+    border-color: #e9edf2;
+    color: #b3bcc5;
+    cursor: not-allowed;
+}
+
+.btn--ghost {
+    background: #fff;
+    color: #0168bd;
+    border-color: #dfe6ee;
+}
+.btn--ghost:hover { background: #f2f8ff; border-color: #9ecbf0; }
+.btn-arrow { transition: transform 0.15s; }
+.btn--ghost:hover .btn-arrow--back { transform: translateX(-3px); }
+
+/* ══ Team members ══════════════════════════════════════════════════════════ */
+.lane-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 20px 0 10px;
+}
+.lane-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3a4149;
+}
+.count-pill {
+    font-size: 11px;
+    font-weight: 700;
+    background: #f0f3f7;
+    color: #7a8590;
+    padding: 2px 9px;
+    border-radius: 999px;
+}
+
+.mlist {
+    border: 1px solid #e9edf2;
+    border-radius: 10px;
+    background: #fbfcfd;
+    overflow: hidden;
+}
+.mrow {
+    display: grid;
+    grid-template-columns: 1fr 190px 36px;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #eef1f5;
+    transition: background 0.15s;
+}
+.mrow:last-child { border-bottom: none; }
+.mrow:hover { background: #f4f9fe; }
+
+.mrow-who {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e3f0fb;
+    color: #0168bd;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+.member-name {
+    font-weight: 600;
+    color: #16191c;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Role badges (class names come from the JS controller) */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.role-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.role-primary {
+    color: #3d7f56;
+    background: #eaf6ee;
+}
+.role-supporting {
+    color: #6b7581;
+    background: #f0f3f7;
+}
+
+/* Remove button */
+.member-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #b3bcc5;
+    font-size: 18px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    line-height: 1;
+    justify-self: end;
+    opacity: 0;
+    transition: color 0.15s, background 0.15s, opacity 0.15s;
+}
+.mrow:hover .member-remove,
+.member-remove:focus { opacity: 1; }
+.member-remove:hover {
+    color: #c23934;
+    background: #fdecec;
+}
+
+/* ══ Empty state ═══════════════════════════════════════════════════════════ */
+.v1-empty {
+    border: 1px solid #eaeef3;
+    border-radius: 10px;
+    background: #fafbfd;
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.v1-ewrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #eef5fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.v1-ewrap lightning-icon {
+    --sds-c-icon-color-foreground-default: #7cb6e6;
+}
+.empty-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #3a4149;
+    margin: 0 0 4px;
+}
+.empty-sub {
+    font-size: 12.5px;
+    color: #8a94a0;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* ══ Footer ════════════════════════════════════════════════════════════════ */
+.st-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 28px;
+    border-top: 1px solid #eaeef3;
+    background: #fbfcfd;
+}
+.footer-note {
+    font-size: 12px;
+    color: #8a94a0;
+}
+.footer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ══ Error message ═════════════════════════════════════════════════════════ */
+.error-msg {
+    color: #c23934;
+    font-size: 12px;
+    margin: 10px 0 0;
+}
+
+/* ══ Step 2 back button ════════════════════════════════════════════════════ */
+.back-row {
+    padding: 8px 28px 16px;
+}

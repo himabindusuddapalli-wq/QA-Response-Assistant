@@ -1,0 +1,332 @@
+/* ── Header ── */
+.modal-head {
+  background: #e8f1fb;
+  padding: 22px 48px 20px;
+  text-align: center;
+  position: relative;
+  margin: -1rem -1.5rem 1.5rem -1.5rem;
+}
+.modal-head h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  color: #16325c;
+}
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #fff;
+  border: 0.5px solid #d6e0ee;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #5b6472;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  line-height: 1;
+}
+.close-btn:hover { background: #f0f4f9; color: #16325c; }
+
+/* ── Body ── */
+.modal-body { padding: 0; }
+
+/* Fields: Company + MA side by side, RFP / Review Due Date in next row */
+.three-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.field-group { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-weight: 500;
+  font-size: 13px;
+  color: #3e3e3c;
+  margin-bottom: 6px;
+}
+.label-sub { font-weight: 400; color: #98a2b3; }
+
+/* Required-field marker (e.g. Review Due Date *) */
+.required-asterisk {
+  color: #c23934;
+  margin-left: 2px;
+  font-weight: 600;
+}
+
+/* Small helper note under a field (e.g. Review Due Date hint) */
+.field-note {
+  font-size: 12px;
+  color: #98a2b3;
+  margin: 6px 0 0;
+}
+
+/* Soften the lightning-input search boxes + brand focus ring */
+.field-group lightning-input {
+  --slds-c-input-radius-border: 8px;
+  --slds-c-input-color-border: #d6dde6;
+  --slds-c-input-color-border-focus: #1b5297;
+}
+
+/* ── Info banner ── */
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff8e6;
+  border: 1px solid #f2dca0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  color: #7a5600;
+}
+.info-icon {
+  font-size: 15px;
+  color: #b9820a;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* ── Dropdown ── */
+.dropdown {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  border: 1px solid #d6dde6;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 140px;
+  overflow-y: auto;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(20,30,50,0.12);
+  position: relative;
+  z-index: 10;
+}
+.dropdown li { padding: 8px 12px; cursor: pointer; font-size: 13px; color: #44505f; }
+.dropdown li:hover { background: #eaf2fc; }
+
+/* ── File upload zone (dashed drop area) ── */
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px dashed #b7c6da;
+  border-radius: 12px;
+  padding: 26px 20px;
+  background: #f7faff;
+  margin-bottom: 4px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.upload-zone:hover { border-color: #1b5297; background: #f2f7fd; }
+.upload-zone-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #c6dcf5;
+  border-radius: 24px;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1b5297;
+  background: #fff;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.upload-zone-btn:hover { background: #eaf1fb; border-color: #1b5297; }
+.upload-arrow { font-size: 15px; }
+.hidden-input { display: none; }
+.upload-zone-off {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ── File preview card ── */
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #e0e6ee;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: #fafcff;
+  margin-bottom: 4px;
+}
+.file-icon {
+  width: 40px;
+  height: 48px;
+  background: #1b5297;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.file-info { flex: 1; min-width: 0; }
+.file-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #16325c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.file-meta { display: block; font-size: 12px; color: #98a2b3; margin-top: 3px; }
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: #98a2b3;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.remove-btn:hover { color: #c23934; background: #fdf2f2; }
+
+.file-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #98a2b3;
+  margin: 8px 0 0;
+}
+
+.error { color: #c23934; font-size: 12px; margin-top: 6px; }
+
+.processing-note {
+  color: #1b5297;
+  font-weight: 600;
+}
+
+/* ── Excel mapping panel ── */
+.excel-map-wrap {
+  background: #f7faff;
+  border: 1px solid #dde5ef;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+.excel-map-title {
+  font-size: 12px;
+  color: #5b6472;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sheet-block {
+  background: #fff;
+  border: 1px solid #e0e6ee;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.sheet-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  color: #1b5297;
+}
+.sheet-check-label input[type="checkbox"] { cursor: pointer; }
+.sheet-name { flex: 1; }
+.sheet-map-body {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+.map-row { display: flex; flex-direction: column; gap: 3px; }
+.map-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #44505f;
+  margin: 0;
+}
+.map-label abbr { text-decoration: none; color: #c23934; }
+
+/* ── Footer ── */
+.modal-foot {
+  padding: 14px 0 0;
+  text-align: right;
+  border-top: 0.5px solid #eef1f5;
+  margin-top: 12px;
+}
+.upload-btn {
+  background: #1b5297;
+  color: #fff;
+  border: none;
+  padding: 11px 30px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.upload-btn:not(:disabled):hover { background: #144080; }
+.upload-btn:disabled { background: #c9c9c9; cursor: not-allowed; }
+.upload-btn-off {
+  background: #c9c9c9 !important;
+  color: #888 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* ── Upload spinner overlay ── */
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 50, 92, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  border-radius: inherit;
+}
+.upload-overlay-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  min-width: 220px;
+}
+.upload-overlay-msg {
+  font-size: 15px;
+  font-weight: 600;
+  color: #16325c;
+  margin: 0;
+}
+.upload-cancel-btn {
+  padding: 6px 24px;
+  border: 1px solid #b0bec5;
+  border-radius: 4px;
+  background: #fff;
+  color: #5b6472;
+  font-size: 13px;
+  cursor: pointer;
+}
+.upload-cancel-btn:hover { background: #f4f6f9; color: #16325c; }

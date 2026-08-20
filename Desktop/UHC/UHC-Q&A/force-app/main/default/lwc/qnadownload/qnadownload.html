@@ -1,0 +1,170 @@
+<template>
+    <div class="qa-panel">
+
+        <!-- ===== Main download view ===== -->
+        <template if:true={showDownloadView}>
+            <!-- Header -->
+            <div class="qa-head">
+                <span class="qa-title">Download Q&amp;A Response</span>
+                <template if:true={stats}>
+                    <span class="qa-subtitle">{docName}<template if:true={hasFile}> &mdash; {fileName}</template></span>
+                </template>
+            </div>
+
+            <template if:true={isLoading}>
+                <div class="qa-spinner">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={stats}>
+                <!-- Stats bar -->
+                                <!-- Stats bar -->
+                <div class="qa-stats">
+                    <div class="qa-stat">
+                        <span class="qa-stat-num">{total}</span>
+                        <span class="qa-stat-lbl">Total Questions</span>
+                    </div>
+
+                    <div class="qa-stat qa-has-tip">
+                        <span class="qa-stat-num">{finalized}<template if:true={hasStrategic}><span class="qa-strat"> ({strategicCount} strategic)</span></template></span>
+                        <span class="qa-stat-lbl">Finalized</span>
+                        <span class="qa-tip">{finalizedTip}</span>
+                    </div>
+
+                    <div class="qa-stat qa-has-tip">
+                        <span class="qa-stat-num">{draftCount}</span>
+                        <span class="qa-stat-lbl">Draft</span>
+                        <span class="qa-tip">Still in progress and not yet completed.</span>
+                    </div>
+
+                    <div class="qa-stat qa-has-tip">
+                        <span class="qa-stat-num">{pending}</span>
+                        <span class="qa-stat-lbl">Pending</span>
+                        <span class="qa-tip">Answers not yet finalized.</span>
+                    </div>
+                </div>
+
+                <p class="qa-section-label">Standard export &mdash; choose what goes in each file</p>
+
+                <div class="qa-cards">
+                    <!-- All Questions -->
+                    <div class="qa-card">
+                        <p class="qa-card-title">All Questions</p>
+
+                        <label class="qa-check">
+                            <input type="checkbox" class="qa-cb-input" data-key="allFinalized" checked={allFinalized} onchange={handleToggle} />
+                            <span class="qa-cb"></span>
+                            <span class="qa-cb-text"><span class="qa-cb-lbl">Finalized</span> - All finalized questions and answers.</span>
+                        </label>
+                        <label class="qa-check">
+                            <input type="checkbox" class="qa-cb-input" data-key="allDraft" checked={allDraft} onchange={handleToggle} />
+                            <span class="qa-cb"></span>
+                            <span class="qa-cb-text"><span class="qa-cb-lbl">Draft</span> - In-progress, not yet finalized</span>
+                        </label>
+                        <label class="qa-check">
+                            <input type="checkbox" class="qa-cb-input" data-key="allUnanswered" checked={allUnanswered} onchange={handleToggle} />
+                            <span class="qa-cb"></span>
+                            <span class="qa-cb-text"><span class="qa-cb-lbl">Unanswered</span> - No answer selected yet</span>
+                        </label>
+
+                        <div class="qa-card-actions">
+                            <button class="qa-btn qa-btn--secondary" onclick={handleCancel}>Cancel</button>
+                            <button class="qa-btn qa-btn--primary" onclick={handleDownloadAll}>Download</button>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Questions -->
+                    <div class="qa-card">
+                        <p class="qa-card-title">Strategic Questions</p>
+
+                        <label class="qa-check">
+                            <input type="checkbox" class="qa-cb-input" data-key="stratFinalized" checked={stratFinalized} onchange={handleToggle} />
+                            <span class="qa-cb"></span>
+                            <span class="qa-cb-text"><span class="qa-cb-lbl">Finalized</span> - Finalized questions with a strategy applied.</span>
+                        </label>
+                        <label class="qa-check">
+                            <input type="checkbox" class="qa-cb-input" data-key="stratDraft" checked={stratDraft} onchange={handleToggle} />
+                            <span class="qa-cb"></span>
+                            <span class="qa-cb-text"><span class="qa-cb-lbl">Draft</span> - In-progress, not yet finalized</span>
+                        </label>
+
+                        <div class="qa-card-actions">
+                            <button class="qa-btn qa-btn--secondary" onclick={handleCancel}>Cancel</button>
+                            <button class="qa-btn qa-btn--primary" onclick={handleDownloadStrategic}>Download</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best-Match -->
+                <div class="qa-card qa-card--wide qa-card--accent">
+                    <p class="qa-card-title">Unanswered &mdash; Best-Match Download</p>
+                    <p class="qa-card-desc">Pulls the top match for every unanswered question, auto-runs style and general checks, and packages it as one document &mdash; no manual review needed. Strategy isn't applied, since that's a manual step.</p>
+
+                    <div class="qa-pills">
+                        <span class="qa-pill">Style checks: auto</span>
+                        <span class="qa-pill">General checks: auto</span>
+                        <span class="qa-pill">Strategy: not applied</span>
+                        <span class="qa-pill">Runs in background</span>
+                    </div>
+
+                    <label class="qa-check">
+                        <input type="checkbox" class="qa-cb-input" data-key="emailWhenReady" checked={emailWhenReady} onchange={handleToggle} />
+                        <span class="qa-cb"></span>
+                        <span class="qa-cb-text"><span class="qa-cb-lbl">Email me when the file's ready</span></span>
+                    </label>
+
+                    <div class="qa-card-actions">
+                        <button class="qa-btn qa-btn--secondary" onclick={handleCancel}>Cancel</button>
+                        <button class="qa-btn qa-btn--primary" onclick={handleBestMatch} disabled={bestMatchLoading}>{bestMatchLabel}</button>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <!-- ===== Strategic warning (0 or 1 strategy applied) ===== -->
+        <template if:true={showStrategicWarning}>
+            <div class="qa-warn">
+                <div class="qa-warn-band">
+                    <p class="qa-warn-title">Not many questions have strategy applied</p>
+                    <p class="qa-warn-msg">{strategicMessage}</p>
+                </div>
+
+                <div class="qa-warn-stats">
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num">{strategicInfo.total}</span>
+                        <span class="qa-warn-lbl">Total</span>
+                    </div>
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num">{strategicInfo.completed}</span>
+                        <span class="qa-warn-lbl">Completed</span>
+                    </div>
+                    <div class="qa-warn-stat">
+                        <span class="qa-warn-num qa-amber">{strategicInfo.strategic}</span>
+                        <span class="qa-warn-lbl">Strategy Applied</span>
+                    </div>
+                </div>
+
+                <div class="qa-warn-actions">
+                    <button class="qa-btn qa-btn--primary" onclick={handleGoApplyStrategy}>Go back &amp; apply strategy</button>
+                    <button class="qa-btn qa-btn--secondary" onclick={handleDownloadAnyway}>Download anyway</button>
+                    <button class="qa-btn qa-btn--secondary" onclick={handleCloseWarning}>Cancel</button>
+                </div>
+            </div>
+        </template>
+
+        <!-- ===== Review workspace swap ===== -->
+        <template if:true={showWorkspace}>
+            <div class="qa-ws-bar">
+                <button class="qa-back-btn" onclick={handleBackToDownload}>
+                    <lightning-icon icon-name="utility:back" size="xx-small" class="qa-back-icon"></lightning-icon>
+                    <span>Back to download</span>
+                </button>
+            </div>
+            <div class="qa-ws-host">
+                <c-qnareviewpannel record-id={_recordId} strategy-mode="true"></c-qnareviewpannel>
+            </div>
+        </template>
+
+    </div>
+</template>

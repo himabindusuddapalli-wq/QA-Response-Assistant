@@ -1,0 +1,154 @@
+<template>
+
+    <!-- STEP 1: Manage team -->
+    <template if:true={notAssignStep}>
+        <div class="panel">
+
+            <!-- Header -->
+            <div class="st-head">
+                <p class="st-eyebrow">Q&amp;A Document</p>
+                <h2 class="st-title">Set up the team</h2>
+            </div>
+
+            <!-- Loading -->
+            <template if:true={isLoading}>
+                <div class="loading-row">
+                    <lightning-spinner size="small" alternative-text="Loading"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={doneLoading}>
+
+                <div class="panel-body">
+
+                    <!-- Add row: who + role + action -->
+                    <div class="addbox">
+                    <div class="add-row">
+                        <div class="add-field add-field--grow">
+                            <label class="field-label" for="user-search">User</label>
+                            <template if:true={selectedUser}>
+                                <span class="selected-pill">
+                                    <lightning-icon icon-name="utility:user" size="xx-small" class="pill-icon"></lightning-icon>
+                                    <span class="pill-name">{selectedUser.name}</span>
+                                    <button class="pill-clear" onclick={handleClearUser} title="Clear">&times;</button>
+                                </span>
+                            </template>
+
+                            <template if:true={noSelectedUser}>
+                                <div class="user-lookup-wrap">
+                                    <div class="search-wrap">
+                                        <lightning-icon icon-name="utility:search" size="xx-small" class="search-icon"></lightning-icon>
+                                        <input type="text" id="user-search" class="search-input"
+                                            placeholder="Search by name..."
+                                            value={userSearch} oninput={handleUserSearch} />
+                                    </div>
+
+                                    <template if:true={hasUserResults}>
+                                        <ul class="results-dropdown">
+                                            <template for:each={userResults} for:item="u">
+                                                <li key={u.id} class="result-item"
+                                                    data-id={u.id} data-name={u.name}
+                                                    onclick={handlePickUser}>
+                                                    {u.name}
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </template>
+
+                                    <template if:true={showNoResults}>
+                                        <p class="no-results">No users found.</p>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="add-field add-field--role">
+                            <span class="field-label">Role</span>
+                            <lightning-combobox
+                                label="Role"
+                                variant="label-hidden"
+                                options={roleOptions}
+                                value={role}
+                                onchange={handleRoleChange}>
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="add-field add-field--btn">
+                            <button class="add-btn" onclick={handleAdd} disabled={addDisabled}>
+                                {addBtnLabel}
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="role-note">
+                        <strong>Primary Owner</strong> can edit every question &nbsp;·&nbsp;
+                        <strong>Supporting User</strong> can edit only the questions assigned to them
+                    </p>
+                    </div>
+
+                    <template if:true={errorMsg}>
+                        <p class="error-msg">{errorMsg}</p>
+                    </template>
+
+                    <!-- Team members -->
+                    <div class="lane-head">
+                        <span class="lane-label">Team members</span>
+                        <span class="count-pill">{teamMembers.length}</span>
+                    </div>
+
+                    <template if:true={hasMembers}>
+                        <div class="mlist">
+                            <template for:each={teamMembers} for:item="m">
+                                <div key={m.id} class="mrow">
+                                    <div class="mrow-who">
+                                        <span class="member-avatar">{m.initials}</span>
+                                        <span class="member-name">{m.userName}</span>
+                                    </div>
+                                    <div class="mrow-role">
+                                        <span class={m.roleClass}>{m.role}</span>
+                                    </div>
+                                    <button class="member-remove" data-id={m.id}
+                                        onclick={handleRemove} title="Remove member">&times;</button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:true={noMembers}>
+                        <div class="v1-empty">
+                            <div class="v1-ewrap">
+                                <lightning-icon icon-name="utility:groups" size="small"></lightning-icon>
+                            </div>
+                            <p class="empty-title">Nobody on the team yet</p>
+                            <p class="empty-sub">Add someone above to give them access.</p>
+                        </div>
+                    </template>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="st-footer">
+                    <span class="footer-note">Only people on this team can open the document</span>
+                    <div class="footer-actions">
+                        <button class="btn btn--brand" onclick={handleNextStep} disabled={noMembers}>
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+            </template>
+
+        </div>
+    </template>
+
+    <!-- STEP 2: Assign Owners (embedded) -->
+    <template if:true={showAssignStep}>
+        <c-qa-assign-owners record-id={recordId}></c-qa-assign-owners>
+        <div class="back-row">
+            <button class="btn btn--ghost" onclick={handleBackStep}>
+                <span class="btn-arrow btn-arrow--back">&larr;</span> Back to team
+            </button>
+        </div>
+    </template>
+
+</template>
